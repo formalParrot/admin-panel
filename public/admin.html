@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Admin</title>
+        <link rel="stylesheet" href="https://justparrot.me/place/place.css">
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+        <style>
+            .monsterrat {
+                font-family: "Montserrat", sans-serif;
+                font-optical-sizing: auto;
+                font-weight: 600;
+                font-style: normal;
+            }
+            .monsterrat-i {
+                font-family: "Montserrat", sans-serif;
+                font-optical-sizing: auto;
+                font-weight: 600;
+                font-style: italic;
+            }
+
+            table {
+                width: 100%;
+            }
+
+            th, td {
+                text-align: left;
+                padding: 8px;
+            }
+
+            .gray {
+                color: dimgray;
+            }
+
+            .orange {
+                color: orangered;
+            }
+        </style>
+
+        <style>
+            .tokenIssue {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.5);
+
+                align-items: center;
+                justify-content: center;
+            }
+
+            .tokenIssue-content {
+                background: white;
+                padding: 30px;
+                border-radius: 15px;
+                width: 400px;
+            }
+
+            .tokenIssue-show {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.5);
+
+                align-items: center;
+                justify-content: center;
+            }
+
+            .tokenIssue-show-content {
+                background: white;
+                padding: 30px;
+                border-radius: 15px;
+                width: 400px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1 class="t-c-c monsterrat">My Admin Panel</h1>
+
+        <div>
+            <div class="f-c-c gap-l">
+                <div style="border: 1.5px black solid; padding: 5px; border-radius: 7px;">
+                    <h3 class="monsterrat-i t-c-c">Tokens</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="">ID</th>
+                                <th class="">User</th>
+                                <th class="">Site</th>
+                                <th class="">Expires</th>
+                                <th class="">Revoked</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="tokens" class="gray">
+                            <!-- Rows get inserted here -->
+                        </tbody>
+                    </table>
+                    <div class="f-c-c gap-m" style="margin-top: 15px; margin-bottom: 15px;">
+                        <button id="issue">Issue Token</button>
+                        <button id="issue">Revoke Token</button>
+                    </div>
+                    <div class="fc-c-c tokenIssue" id="tokenIssue">
+                        <div class="tokenIssue-content g-c-c">
+                            <button onclick="closePopup('tokenIssue')">×</button>
+                            <h2>Issue an Access Token</h2>
+
+                            <div class="g-c-c gap-s">
+                                <input placeholder="Username" id="tokenIssue-user" >
+                                <input placeHolder="Site" id="tokenIssue-site">
+                                <input type="datetime-local" id="tokenIssue-expiry">
+
+                                <button id="tokenIssue-btn">Request</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fc-c-c tokenIssue-show" id="tokenIssue-show">
+                        <div class="tokenIssue-show-content g-c-c gap-m">
+                            <button onclick="closePopup('tokenIssue-show')">×</button>
+
+                            <a id="tokenIssue-show-txt">Activate Link</a>
+                        </div>
+                    </div>
+                    <div class="fc-c-c tokenRevoke" id="tokenRevoke">
+                        <div class="tokenRevoke-content g-c-c">
+                            <button onclick="closePopup('tokenRevoke')">×</button>
+                            <h2>Revoke an Access Token</h2>
+
+                            <div class="g-c-c gap-s">
+                                <input placeholder="ID" id="tokenRevoke-id" >
+
+                                <button id="tokenRevoke-btn">Request</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script>
+        function getExpirySeconds() {
+            const value = document.getElementById("tokenIssue-expiry").value;
+
+            if (!value) return null;
+
+            const expiryTimestamp = Math.floor(new Date(value).getTime() / 1000);
+            const nowTimestamp = Math.floor(Date.now() / 1000);
+
+            return expiryTimestamp - nowTimestamp;
+        }
+
+        function openPopup(popup) {
+            document.getElementById(popup).style.display = "flex";
+        }
+
+        function closePopup(popup) {
+            document.getElementById(popup).style.display = "none";
+        }
+
+      document.getElementById("issue").addEventListener("click", async () => {
+        openPopup("tokenIssue")
+      })
+
+      document.getElementById("tokenIssue-btn").addEventListener("click", async () => {
+        const user = document.getElementById("tokenIssue-user").value
+        const site = document.getElementById("tokenIssue-site").value
+
+        const expiry = getExpirySeconds()
+
+        const payload = {
+            action: "issue",
+            user,
+            site,
+            expiresInSeconds: expiry
+        };
+
+        const response = await fetch("/admin/lock", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+
+        const data = await response.json();
+
+        if (data.id) {
+          console.log(data)
+        }
+        loadTokens()
+
+        closePopup("tokenIssue")
+        openPopup("tokenIssue-show")
+        document.getElementById("tokenIssue-show-txt").href = data.activate_uri;
+      })
+    </script>
+
+    <script>
+      async function loadTokens() {
+          const response = await fetch("/admin/lock", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ action: "tokens" })
+          });
+          const tokens = await response.json();
+
+          const tbody = document.getElementById("tokens");
+
+          tbody.innerHTML = "";
+
+          for (const token of tokens) {
+              const row = document.createElement("tr");
+
+              row.innerHTML = `
+                  <td class="orange">${token.id}</td>
+                  <td>${token.user}</td>
+                  <td>${token.site}</td>
+                  <td>${new Date(token.expires_at * 1000).toLocaleString(undefined, {
+                    year: 'numeric',
+                    month: 'numeric',
+                    hour12: false,
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}</td>
+                  <td>${token.revoked ? "Yes" : "No"}</td>
+              `;
+
+              tbody.appendChild(row);
+          }
+      }
+
+      loadTokens();
+    </script>
+</html>

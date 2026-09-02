@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Parrot</title>
+        <link rel="stylesheet" href="https://justparrot.me/place/place.css">
+
+        <style>
+            .fc-c-c input,
+            .fc-c-c button {
+                font-size: 20px;
+                padding: 12px 16px;
+            }
+
+            .fc-c-c input {
+                width: 250px;
+            }
+
+            .fc-c-c button {
+                width: 250px;
+            }
+        </style>
+    </head>
+    <body>
+        <div style="margin: auto" class="fill-screen fc-c-c">
+            <input type="password" id="pin" placeholder="Enter PIN">
+            <button id="login" style="margin-top: 10px">Login</button>
+        </div>
+    </body>
+    <script>
+      document.getElementById("login").addEventListener("click", async () => {
+        const pin = document.getElementById("pin").value;
+
+        const response = await fetch("/admin/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ pin })
+        })
+
+        const data = await response.json();
+
+        if (data.ok) {
+            window.location.reload();
+        } else {
+            alert(data.error || "Invalid PIN");
+        }
+      })
+    </script>
+</html>
