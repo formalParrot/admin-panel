@@ -111,7 +111,7 @@
                                 <th class="">User</th>
                                 <th class="">Site</th>
                                 <th class="">Expires</th>
-                                <th class="">Revoked</th>
+                                <th class="">Status</th>
                             </tr>
                         </thead>
 
@@ -121,20 +121,20 @@
                     </table>
                     <div class="f-c-c gap-m" style="margin-top: 15px; margin-bottom: 15px;">
                         <button id="issue">Issue Token</button>
-                        <button id="issue">Revoke Token</button>
+                        <button id="revoke">Revoke Token</button>
                     </div>
                     <div class="fc-c-c tokenIssue" id="tokenIssue">
                         <div class="tokenIssue-content g-c-c">
                             <button onclick="closePopup('tokenIssue')">×</button>
                             <h2>Issue an Access Token</h2>
 
-                            <div class="g-c-c gap-s">
+                            <form id="issue-form" class="g-c-c gap-s">
                                 <input placeholder="Username" id="tokenIssue-user" >
                                 <input placeHolder="Site" id="tokenIssue-site">
                                 <input type="datetime-local" id="tokenIssue-expiry">
 
                                 <button id="tokenIssue-btn">Request</button>
-                            </div>
+                            </form>
                         </div>
                     </div>
                     <div class="fc-c-c tokenIssue-show" id="tokenIssue-show">
@@ -149,11 +149,11 @@
                             <button onclick="closePopup('tokenRevoke')">×</button>
                             <h2>Revoke an Access Token</h2>
 
-                            <div class="g-c-c gap-s">
-                                <input placeholder="ID" id="tokenRevoke-id" >
+                            <form id="revoke-form" class="g-c-c gap-s">
+                                <input placeholder="ID" id="tokenRevoke-id">
 
                                 <button id="tokenRevoke-btn">Request</button>
-                            </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -191,8 +191,16 @@
             document.getElementById(popup).style.display = "none";
         }
 
+        function closeForm(la) {
+            la.reset()
+        }
+
       document.getElementById("issue").addEventListener("click", async () => {
         openPopup("tokenIssue")
+      })
+
+      document.getElementById("revoke").addEventListener("click", async () => {
+        openPopup("tokenRevoke")
       })
 
       document.getElementById("tokenIssue-btn").addEventListener("click", async () => {
@@ -228,6 +236,32 @@
         openPopup("tokenIssue-show")
         document.getElementById("tokenIssue-show-txt").href = data.activate_uri;
       })
+
+      document.getElementById("tokenRevoke-btn").addEventListener("click", async () => {
+        const form = document.getElementById("revoke-form")
+        const id = document.getElementById("tokenRevoke-id").value
+
+        const payload = {
+            action: "revoke",
+            id,
+        };
+
+        const response = await fetch("/admin/lock", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+
+        const data = await response.json();
+        loadTokens()
+
+
+        closeForm(form)
+        closePopup("tokenRevoke")
+      })
     </script>
     <!-- token render -->
     <script>
@@ -260,7 +294,9 @@
                     hour: '2-digit',
                     minute: '2-digit'
                   })}</td>
-                  <td>${token.revoked ? "Yes" : "No"}</td>
+                  <td>
+                    ${token.revoked ? "Revoked" : (new Date(token.expires_at * 1000) < new Date() ? "Expired" : "Active")}
+                  </td>
               `;
 
               tbody.appendChild(row);
