@@ -22,7 +22,15 @@
     </head>
     <body>
         <div style="margin: auto" class="fill-screen fc-c-c">
-            <input type="password" id="pin" placeholder="Enter PIN">
+            <input
+              type="password"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              autocomplete="one-time-code"
+              maxlength="6"
+              id="pin"
+              placeholder="Enter PIN"
+            >
             <button id="login" style="margin-top: 10px">Login</button>
         </div>
     </body>
