@@ -22,28 +22,34 @@
     </head>
     <body>
         <div style="margin: auto" class="fill-screen fc-c-c">
-            <input
-              type="password"
-              inputmode="numeric"
-              pattern="[0-9]*"
-              maxlength="6"
-              id="pin"
-              placeholder="Enter PIN"
-            >
-            <button id="login" style="margin-top: 10px">Login</button>
+            <form id="login-form">
+                <input
+                  type="password"
+                  inputmode="numeric"
+                  pattern="[0-9]*"
+                  maxlength="6"
+                  id="pin"
+                  placeholder="Enter PIN"
+                >
+                <button type="submit" id="login" style="margin-top: 10px">
+                    Login
+                </button>
+            </form>
         </div>
     </body>
     <script>
-      document.getElementById("login").addEventListener("click", async () => {
+    document.getElementById("login-form").addEventListener("submit", async (event) => {
+        event.preventDefault();
+
         const pin = document.getElementById("pin").value;
 
         const response = await fetch("/admin/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ pin })
-        })
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ pin })
+        });
 
         const data = await response.json();
 
@@ -52,6 +58,6 @@
         } else {
             alert(data.error || "Invalid PIN");
         }
-      })
+    });
     </script>
 </html>
