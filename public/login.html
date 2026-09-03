@@ -36,26 +36,26 @@
         </div>
     </body>
     <script>
-    document.getElementById("login-form").addEventListener("submit", async (event) => {
-        event.preventDefault();
+      document.getElementById("login-form").addEventListener("submit", async (event) => {
+          event.preventDefault();
 
-        const pin = document.getElementById("pin").value;
+          const pin = document.getElementById("pin").value;
 
-        const response = await fetch("/admin/login", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ pin })
-        });
+          const response = await fetch("/admin/login", {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json"
+              },
+              body: JSON.stringify({ pin })
+          });
 
-        const data = await response.json();
+          const data = await response.json();
 
-        if (data.ok) {
-            window.location.reload();
-        } else {
-            alert(data.error || "Invalid PIN");
-        }
-    });
+          if (data.ok) {
+              window.location.reload();
+          } else {
+              alert(data.error || "Invalid PIN");
+          }
+      });
     </script>
 </html>
