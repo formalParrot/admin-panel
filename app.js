@@ -3,10 +3,13 @@ const express = require('express');
 const bcrypt = require('bcrypt')
 const session = require('express-session');
 const requireAdmin = require('./middleware/requireAdmin');
+const path = require('path');
 
 const app = express()
 app.use(express.json());
 const router = express.Router();
+
+const notificationRouter = require('./notifications')
 
 const allowedActions = {
   issue: "/lock/admin/issue",
@@ -125,5 +128,9 @@ router.post("/lock", requireAdmin, async (req, res) => {
 });
 
 app.use("/admin", router);
+app.use("/admin/notifications", notificationRouter)
+
+app.use(express.static(path.join(__dirname, 'public/assets/')));
+
 const PORT = process.env.PORT || 9879;
 app.listen(PORT, () => console.log(`Admin API running on port ${PORT}`));
