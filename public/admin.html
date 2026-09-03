@@ -94,7 +94,11 @@
         </style>
     </head>
     <body>
-        <h1 class="t-c-c monsterrat">My Admin Panel</h1>
+        <div class="fc-c-c gap-0">
+            <h1 class=" monsterrat">My Admin Panel</h1>
+
+            <button id="logout-btn" style="margin-bottom: 10px;">Log Out</button>
+        </div>
 
         <div>
             <div class="f-c-c gap-l">
@@ -157,6 +161,17 @@
         </div>
     </body>
     <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("logout-btn").addEventListener("click", async () => {
+          const res = await fetch("/admin/logout", { method: "POST", headers: { "Content-Type": "application/json" } });
+          if (res.ok) window.location.reload();
+          else console.error("Logout failed", res.status);
+        });
+      });
+    </script>
+
+    <!-- token works -->
+    <script>
         function getExpirySeconds() {
             const value = document.getElementById("tokenIssue-expiry").value;
 
@@ -214,7 +229,7 @@
         document.getElementById("tokenIssue-show-txt").href = data.activate_uri;
       })
     </script>
-
+    <!-- token render -->
     <script>
       async function loadTokens() {
           const response = await fetch("/admin/lock", {
