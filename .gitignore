@@ -3,3 +3,7 @@ package-lock.json
 .DS_Store
 node_modules
 AGENTS.md
+
+graphify-out/
+
+.opencode/
