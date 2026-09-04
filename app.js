@@ -25,7 +25,7 @@ app.use(session({
   cookie: {
     httpOnly: true,
     secure: false, //https
-    sameSite: 'strict',
+    sameSite: 'lax',
     maxAge: 1000 * 60 * 60 * 24
   }
 }));
@@ -70,8 +70,17 @@ router.post("/login", async (req, res) => {
 
     req.session.admin = true;
 
-    return res.json({
-      ok: true
+    req.session.save((saveErr) => {
+      if (saveErr) {
+        return res.status(500).json({
+          ok: false,
+          error: "Failed to save session"
+        });
+      }
+
+      return res.json({
+        ok: true
+      });
     });
   });
 });
@@ -79,7 +88,7 @@ router.post("/login", async (req, res) => {
 router.post("/logout", (req, res) => {
   req.session.destroy(err => {
     if (err) {
-      return status(500).json({
+      return res.status(500).json({
         ok: false,
         error: "Failed to log out."
       });
