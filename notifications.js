@@ -2,6 +2,16 @@ const express = require('express');
 const requireAdmin = require('./middleware/requireAdmin');
 const router = express.Router();
 
+function broadcast(notification) {
+  for (const client of clients) {
+    try {
+      client.write(`data: ${JSON.stringify(notification)}\n\n`);
+    } catch {
+      clients.delete(client);
+    }
+  }
+}
+
 function createNotification(message, service) {
   const notification = {
     id: Date.now(),
@@ -11,9 +21,7 @@ function createNotification(message, service) {
     createdAt: new Date().toISOString()
   };
   notifications.push(notification);
-  for (const client of clients) {
-    client.write(`data: ${JSON.stringify(notification)}\n\n`);
-  }
+  broadcast(notification);
   return notification;
 }
 
@@ -67,15 +75,27 @@ router.get('/stream', requireAdmin, (req, res) => {
   res.set({
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
-    Connection: 'keep-alive',
-  })
-  res.flushHeaders()
+    'Connection': 'keep-alive',
+    'X-Accel-Buffering': 'no', // disable nginx buffering
+  });
+  res.flushHeaders();
 
-  clients.add(res)
+  res.write(':ok\n\n'); // initial comment so client knows it's connected
+  clients.add(res);
+
+  const heartbeat = setInterval(() => {
+    try {
+      res.write(':heartbeat\n\n');
+    } catch {
+      clearInterval(heartbeat);
+      clients.delete(res);
+    }
+  }, 25000);
 
   req.on('close', () => {
-    clients.delete(res)
-  })
-})
+    clearInterval(heartbeat);
+    clients.delete(res);
+  });
+});
 
 module.exports = router
