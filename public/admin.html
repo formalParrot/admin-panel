@@ -91,6 +91,23 @@
                 border-radius: 15px;
                 width: 400px;
             }
+
+            .tokenAll {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.5);
+
+                align-items: center;
+                justify-content: center;
+            }
+
+            .tokenAll-content {
+                background: white;
+                padding: 30px;
+                border-radius: 15px;
+                width: 700px;
+            }
         </style>
 
         <style>
@@ -272,7 +289,8 @@
 
             .tokenIssue-content > button,
             .tokenIssue-show-content > button,
-            .tokenRevoke-content > button {
+            .tokenRevoke-content > button,
+            .tokenAll-content > button {
             align-self: flex-end;
             border: none;
             background: none;
@@ -284,7 +302,8 @@
 
             .tokenIssue-content > button:hover,
             .tokenIssue-show-content > button:hover,
-            .tokenRevoke-content > button:hover {
+            .tokenRevoke-content > button:hover,
+            .tokenAll-content > button:hover {
             color: var(--ink);
             background: none;
             }
@@ -371,7 +390,8 @@
 
             .tokenIssue,
             .tokenIssue-show,
-            .tokenRevoke {
+            .tokenRevoke,
+            .tokenAll {
             align-items: center;
             justify-content: center;
             background: rgba(33, 31, 27, 0.45);
@@ -379,7 +399,8 @@
 
             .tokenIssue-content,
             .tokenIssue-show-content,
-            .tokenRevoke-content {
+            .tokenRevoke-content,
+            .tokenAll-content {
             background: var(--surface);
             border-radius: 12px;
             box-shadow: var(--shadow-modal);
@@ -488,6 +509,7 @@
                     <div class="f-c-c gap-m" style="margin-top: 15px; margin-bottom: 15px;">
                         <button id="issue">Issue Token</button>
                         <button id="revoke">Revoke Token</button>
+                        <button id="view-all">View All</button>
                     </div>
                     <div class="fc-c-c tokenIssue" id="tokenIssue">
                         <div class="tokenIssue-content g-c-c">
@@ -520,6 +542,24 @@
 
                                 <button type="button" id="tokenRevoke-btn">Request</button>
                             </form>
+                        </div>
+                    </div>
+                    <div class="fc-c-c tokenAll" id="tokenAll">
+                        <div class="tokenAll-content g-c-c" style="max-height: 80vh; overflow-y: auto;">
+                            <button onclick="closePopup('tokenAll')">×</button>
+                            <h2>All Tokens</h2>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>User</th>
+                                        <th>Site</th>
+                                        <th>Expires</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="all-tokens" class="gray"></tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -605,6 +645,10 @@
         openPopup("tokenRevoke")
       })
 
+      document.getElementById("view-all").addEventListener("click", () => {
+        openPopup("tokenAll")
+      })
+
       document.getElementById("tokenIssue-btn").addEventListener("click", async () => {
         const user = document.getElementById("tokenIssue-user").value
         const site = document.getElementById("tokenIssue-site").value
@@ -667,6 +711,37 @@
     </script>
     <!-- token render -->
     <script>
+      let allTokens = [];
+
+      function renderTokensRow(token) {
+        return `
+            <td class="orange">${token.id}</td>
+            <td>${token.user}</td>
+            <td>${token.site}</td>
+            <td>${new Date(token.expires_at * 1000).toLocaleString(undefined, {
+              year: 'numeric',
+              month: 'numeric',
+              hour12: false,
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })}</td>
+            <td>
+              ${token.revoked ? "Revoked" : (new Date(token.expires_at * 1000) < new Date() ? "Expired" : "Active")}
+            </td>
+        `;
+      }
+
+      function renderTokenTable(tbodyId, tokens) {
+        const tbody = document.getElementById(tbodyId);
+        tbody.innerHTML = "";
+        for (const token of tokens) {
+          const row = document.createElement("tr");
+          row.innerHTML = renderTokensRow(token);
+          tbody.appendChild(row);
+        }
+      }
+
       async function loadTokens() {
           const response = await fetch("/admin/lock", {
             method: "POST",
@@ -675,34 +750,10 @@
             },
             body: JSON.stringify({ action: "tokens" })
           });
-          const tokens = await response.json();
+          allTokens = await response.json();
 
-          const tbody = document.getElementById("tokens");
-
-          tbody.innerHTML = "";
-
-          for (const token of tokens) {
-              const row = document.createElement("tr");
-
-              row.innerHTML = `
-                  <td class="orange">${token.id}</td>
-                  <td>${token.user}</td>
-                  <td>${token.site}</td>
-                  <td>${new Date(token.expires_at * 1000).toLocaleString(undefined, {
-                    year: 'numeric',
-                    month: 'numeric',
-                    hour12: false,
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}</td>
-                  <td>
-                    ${token.revoked ? "Revoked" : (new Date(token.expires_at * 1000) < new Date() ? "Expired" : "Active")}
-                  </td>
-              `;
-
-              tbody.appendChild(row);
-          }
+          renderTokenTable("tokens", allTokens.slice(-10).reverse());
+          renderTokenTable("all-tokens", [...allTokens].reverse());
       }
 
       loadTokens();
