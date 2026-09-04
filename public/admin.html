@@ -706,6 +706,10 @@
       }
 
       loadTokens();
+
+      const intervalId = setInterval(() => {
+        loadTokens();
+      }, 10000);
     </script>
     <!-- notif render -->
     <script>
@@ -768,7 +772,7 @@
         console.error('SSE connection error:', err);
       };
     </script>
-
+    <!-- theme switcher -->
     <script>
       const root = document.documentElement;
       const saved = localStorage.getItem('theme');
