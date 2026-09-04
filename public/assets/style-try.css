@@ -52,6 +52,29 @@
   --shadow-modal: 0 12px 32px rgba(0, 0, 0, 0.5);
 }
 
+[data-theme="high-contrast"] {
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --border: #000000;
+  --border-strong: #000000;
+
+  --ink: #000000;
+  --ink-muted: #000000;
+  --ink-faint: #333333;
+
+  --accent: #b5501f;
+  --accent-bg: #fbeee6;
+
+  --status-active: #1a6b2a;
+  --status-active-bg: #d4f0da;
+  --status-revoked: #333333;
+  --status-revoked-bg: #e0e0e0;
+  --status-expired: #8a6500;
+  --status-expired-bg: #f5ecc8;
+
+  --shadow-modal: 0 12px 32px rgba(0, 0, 0, 0.3);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -181,6 +204,34 @@ div[style*="border: 1.5px black solid"] {
   border: 1px solid var(--border) !important;
   border-radius: var(--radius) !important;
   background: var(--surface);
+}
+
+[data-theme="high-contrast"] div[style*="border: 1.5px black solid"] {
+  border-width: 2px !important;
+}
+
+[data-theme="high-contrast"] table {
+  border: 2px solid var(--border);
+}
+
+[data-theme="high-contrast"] thead th {
+  border-bottom: 2px solid var(--border);
+}
+
+[data-theme="high-contrast"] #tokens tr {
+  border-bottom: 2px solid var(--border);
+}
+
+[data-theme="high-contrast"] .notification {
+  border-bottom: 2px solid var(--border);
+}
+
+[data-theme="high-contrast"] button {
+  border-width: 2px;
+}
+
+[data-theme="high-contrast"] input {
+  border-width: 2px;
 }
 
 table {
