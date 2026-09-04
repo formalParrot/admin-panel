@@ -8,19 +8,137 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
-        <link rel="stylesheet" href="/admin/style-try.css">
-
         <style>
+            :root {
+                --bg: #faf9f6;
+                --surface: #ffffff;
+                --border: #e4e1d8;
+                --border-strong: #cfccc1;
+
+                --ink: #211f1b;
+                --ink-muted: #6e6b62;
+                --ink-faint: #a8a49a;
+
+                --accent: #b5501f;
+                --accent-bg: #fbeee6;
+
+                --radius: 8px;
+                --radius-sm: 5px;
+
+                --gap-0: 0;
+                --gap-s: 8px;
+                --gap-m: 16px;
+                --gap-l: 28px;
+
+                --shadow-modal: 0 12px 32px rgba(33, 31, 27, 0.18);
+            }
+
+            [data-theme="dark"] {
+                --bg: #171613;
+                --surface: #201f1b;
+                --border: #34322c;
+                --border-strong: #46443c;
+
+                --ink: #f0eee7;
+                --ink-muted: #a8a49a;
+                --ink-faint: #6e6b62;
+
+                --accent: #e0793e;
+                --accent-bg: #3a2a1e;
+
+                --shadow-modal: 0 12px 32px rgba(0, 0, 0, 0.5);
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            html {
+                color-scheme: light;
+            }
+
             body {
+                margin: 0;
+                padding: 32px 40px 56px;
+                background: var(--bg);
+                color: var(--ink);
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+                font-size: 14px;
+                line-height: 1.5;
+                -webkit-font-smoothing: antialiased;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 min-height: 100vh;
-                padding: 0;
+            }
+
+            .monsterrat {
+                font-family: "Montserrat", sans-serif;
+                font-optical-sizing: auto;
+                font-weight: 600;
+                font-style: normal;
+            }
+
+            h1 {
+                font-size: 22px;
+                letter-spacing: -0.01em;
+                margin: 0 0 4px;
+                color: var(--ink);
+            }
+
+            button {
+                font-family: inherit;
+                font-size: 13px;
+                font-weight: 500;
+                color: var(--ink);
+                background: var(--surface);
+                border: 1px solid var(--border-strong);
+                border-radius: var(--radius-sm);
+                padding: 8px 14px;
+                cursor: pointer;
+                transition: border-color 0.12s ease, background 0.12s ease;
+            }
+
+            button:hover {
+                border-color: var(--ink-faint);
+                background: #f5f4f0;
+            }
+
+            button:active {
+                background: #ececE6;
+            }
+
+            button:focus-visible {
+                outline: 2px solid var(--accent);
+                outline-offset: 2px;
+            }
+
+            input {
+                font-family: inherit;
+                font-size: 13px;
+                color: var(--ink);
+                background: var(--surface);
+                border: 1px solid var(--border-strong);
+                border-radius: var(--radius-sm);
+                padding: 9px 11px;
+                width: 100%;
+            }
+
+            input::placeholder {
+                color: var(--ink-faint);
+            }
+
+            input:focus {
+                outline: none;
+                border-color: var(--accent);
+                box-shadow: 0 0 0 3px var(--accent-bg);
+            }
+
+            form {
+                width: 100%;
             }
 
             #login-form {
-                width: 100%;
                 max-width: 320px;
                 display: flex;
                 flex-direction: column;
@@ -63,6 +181,11 @@
         </form>
     </body>
     <script>
+      const root = document.documentElement;
+      const saved = localStorage.getItem('theme');
+      if (saved) root.setAttribute('data-theme', saved);
+    </script>
+    <script>
       document.getElementById("login-form").addEventListener("submit", async (event) => {
           event.preventDefault();
 
@@ -84,10 +207,5 @@
               alert(data.error || "Invalid PIN");
           }
       });
-    </script>
-    <script>
-      const root = document.documentElement;
-      const saved = localStorage.getItem('theme');
-      if (saved) root.setAttribute('data-theme', saved);
     </script>
 </html>
