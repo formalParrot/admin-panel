@@ -77,11 +77,11 @@ router.get('/stream', requireAdmin, (req, res) => {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
     'Connection': 'keep-alive',
-    'X-Accel-Buffering': 'no', // disable nginx buffering
+    'X-Accel-Buffering': 'no',
   });
   res.flushHeaders();
 
-  res.write(':ok\n\n'); // initial comment so client knows it's connected
+  res.write(':ok\n\n');
   clients.add(res);
 
   const heartbeat = setInterval(() => {
