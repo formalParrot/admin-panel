@@ -113,19 +113,27 @@ router.post("/lock", requireAdmin, async (req, res) => {
     });
   }
 
-  const response = await fetch(
-    `${process.env.LOCK_API_URL}${path}`,
-    {
-      method: action === "tokens" ? "GET" : "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-admin-secret": process.env.LOCK_ADMIN_SECRET
-      },
-      ...(action !== "tokens" && {
-        body: JSON.stringify(body)
-      })
-    }
-  );
+  let response;
+  try {
+    response = await fetch(
+      `${process.env.LOCK_API_URL}${path}`,
+      {
+        method: action === "tokens" ? "GET" : "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-secret": process.env.LOCK_ADMIN_SECRET
+        },
+        ...(action !== "tokens" && {
+          body: JSON.stringify(body)
+        })
+      }
+    );
+  } catch (err) {
+    console.error("Lock API unreachable:", err.message);
+    return res.status(502).json({
+      error: "Lock API unreachable"
+    });
+  }
 
   console.log("Lock API status:", response.status);
 

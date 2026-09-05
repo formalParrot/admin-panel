@@ -59,9 +59,10 @@ router.patch('/:id/read', requireAdmin, (req, res) => {
 })
 
 router.get('/missed', requireAdmin, (req, res) => {
-  const missed = lastSeenAt
+  const missed = (lastSeenAt
     ? notifications.filter(n => new Date(n.createdAt) > new Date(lastSeenAt))
-    : notifications;
+    : notifications)
+    .filter(n => !n.read);
 
   res.json(missed)
 })

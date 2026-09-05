@@ -612,6 +612,13 @@
                             </table>
                         </div>
                     </div>
+                    <div class="fc-c-c tokenIssue" id="tokenMissed">
+                        <div class="tokenIssue-content g-c-c">
+                            <button onclick="closePopup('tokenMissed')">×</button>
+                            <h2>Missed Notifications</h2>
+                            <div id="missed-list"></div>
+                        </div>
+                    </div>
                 </div>
                 <div class="" style="display: flex; flex-wrap: wrap; gap: 15px;">
                     <div style="border: 1.5px black solid; padding: 15px; border-radius: 7px; flex: 1 1 250px;">
@@ -619,6 +626,7 @@
 
                         <div id="notification-bell">
                             <span class="monsterrat" style="padding-bottom:5px;"id="unread-count"></span>
+                            <span id="sound-hint" class="gray" style="display: none;">Sound on next click</span>
                             <div id="notification-list"></div>
                         </div>
                     </div>
@@ -647,6 +655,14 @@
 
     <!-- notifications -->
     <script>
+      function renderMissedPopup(missed) {
+        const list = document.getElementById('missed-list');
+        list.innerHTML = missed
+          .map(n => `<div class="notification unread"><strong>${n.service}</strong>: ${n.message}</div>`)
+          .join('');
+        openPopup('tokenMissed');
+      }
+
       function showMissedNotifications() {
         fetch('/admin/notifications/missed')
           .then(res => res.json())
@@ -794,18 +810,29 @@
         }
       }
 
-      async function loadTokens() {
-          const response = await fetch("/admin/lock", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ action: "tokens" })
-          });
-          allTokens = await response.json();
+      let lockDownLogged = false;
 
-          renderTokenTable("tokens", allTokens.slice(-10).reverse());
-          renderTokenTable("all-tokens", [...allTokens].reverse());
+      async function loadTokens() {
+          try {
+            const response = await fetch("/admin/lock", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({ action: "tokens" })
+            });
+            if (!response.ok) throw new Error(`Lock API responded ${response.status}`);
+            lockDownLogged = false;
+            allTokens = await response.json();
+
+            renderTokenTable("tokens", allTokens.slice(-10).reverse());
+            renderTokenTable("all-tokens", [...allTokens].reverse());
+          } catch (err) {
+            if (!lockDownLogged) {
+              lockDownLogged = true;
+              console.error("loadTokens failed:", err.message);
+            }
+          }
       }
 
       loadTokens();
@@ -813,6 +840,91 @@
       const intervalId = setInterval(() => {
         loadTokens();
       }, 10000);
+    </script>
+    <!-- notif sound -->
+    <script>
+      let notificationCtx = null;
+      let pendingSound = false;
+
+      // Called from user-gesture handlers. Browsers block audio outside a
+      // gesture, so never create/resume the context otherwise.
+      function unlockAudio() {
+        // Ignore synthetic or non-gesture events so the browser never logs
+        // autoplay-blocked warnings.
+        if (navigator.userActivation && !navigator.userActivation.isActive) return;
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return;
+        if (!notificationCtx) notificationCtx = new Ctx();
+        const ctx = notificationCtx;
+        const resume = ctx.state === 'suspended' ? ctx.resume() : Promise.resolve();
+        Promise.resolve(resume)
+          .then(() => {
+            if (ctx.state !== 'running') return;
+            hideSoundHint();
+            if (pendingSound) {
+              pendingSound = false;
+              buildNotificationSound(ctx);
+            }
+          })
+          .catch(() => {});
+      }
+
+      ['pointerdown', 'keydown', 'touchstart'].forEach((evt) => {
+        document.addEventListener(evt, unlockAudio);
+      });
+
+      function buildNotificationSound(ctx) {
+        const now = ctx.currentTime;
+        const master = ctx.createGain();
+        master.gain.setValueAtTime(0.0001, now);
+        master.gain.exponentialRampToValueAtTime(0.5, now + 0.02);
+        master.connect(ctx.destination);
+
+        // Distinct 3-tone alert: rising double-beep then a longer high note.
+        const pattern = [
+          { freq: 660, dur: 0.15, gap: 0.08 },
+          { freq: 880, dur: 0.15, gap: 0.08 },
+          { freq: 1320, dur: 0.30, gap: 0 },
+        ];
+
+        let t = now + 0.03;
+        for (const step of pattern) {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'square';
+          osc.frequency.value = step.freq;
+          gain.gain.setValueAtTime(0.0001, t);
+          gain.gain.exponentialRampToValueAtTime(0.35, t + 0.012);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t + step.dur + 0.02);
+          osc.connect(gain).connect(master);
+          osc.start(t);
+          osc.stop(t + step.dur + 0.05);
+          t += step.dur + step.gap;
+        }
+
+        master.gain.exponentialRampToValueAtTime(0.0001, t + 0.05);
+      }
+
+      function playNotificationSound() {
+        if (notificationCtx && notificationCtx.state === 'running') {
+          buildNotificationSound(notificationCtx);
+          return;
+        }
+        // Audio not unlocked yet (no user gesture on this page): queue the
+        // alert and let the next click play it immediately after resuming.
+        pendingSound = true;
+        showSoundHint();
+      }
+
+      function showSoundHint() {
+        const hint = document.getElementById('sound-hint');
+        if (hint) hint.style.display = 'inline';
+      }
+
+      function hideSoundHint() {
+        const hint = document.getElementById('sound-hint');
+        if (hint) hint.style.display = 'none';
+      }
     </script>
     <!-- notif render -->
     <script>
@@ -868,6 +980,7 @@
         const notification = JSON.parse(event.data);
         notifications.unshift(notification);
         render();
+        playNotificationSound();
       };
 
 
