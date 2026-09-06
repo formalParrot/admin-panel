@@ -1,5 +1,6 @@
 const express = require('express');
 const requireAdmin = require('./middleware/requireAdmin');
+const { apiLimiter } = require('./middleware/rateLimiter');
 const router = express.Router();
 
 function broadcast(notification) {
@@ -30,7 +31,7 @@ const clients = new Set();
 
 let lastSeenAt = null;
 
-router.post('/', requireAdmin, (req, res) => {
+router.post('/', apiLimiter, requireAdmin, (req, res) => {
   const { message, service } = req.body;
   const notification = {
     id: Date.now(),

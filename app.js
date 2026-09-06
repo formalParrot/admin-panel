@@ -3,6 +3,7 @@ const express = require('express');
 const bcrypt = require('bcrypt')
 const session = require('express-session');
 const requireAdmin = require('./middleware/requireAdmin');
+const { loginLimiter, apiLimiter } = require('./middleware/rateLimiter');
 const path = require('path');
 
 const app = express()
@@ -38,7 +39,7 @@ app.get("/admin", (req, res) => {
   return res.sendFile(__dirname + "/public/admin.html");
 });
 
-router.post("/login", async (req, res) => {
+router.post("/login", loginLimiter, async (req, res) => {
   const { pin } = req.body;
 
   if (!pin) {
@@ -102,7 +103,7 @@ router.post("/logout", (req, res) => {
   });
 })
 
-router.post("/lock", requireAdmin, async (req, res) => {
+router.post("/lock", apiLimiter, requireAdmin, async (req, res) => {
   const { action, ...body } = req.body;
 
   const path = allowedActions[action];
