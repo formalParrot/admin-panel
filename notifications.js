@@ -1,6 +1,7 @@
 const express = require('express');
 const requireAdmin = require('./middleware/requireAdmin');
-const { apiLimiter } = require('./middleware/rateLimiter');
+const requireWebhook = require('./middleware/requireWebhook');
+const { apiLimiter, webhookLimiter } = require('./middleware/rateLimiter');
 const router = express.Router();
 
 function broadcast(notification) {
@@ -33,19 +34,18 @@ let lastSeenAt = null;
 
 router.post('/', apiLimiter, requireAdmin, (req, res) => {
   const { message, service } = req.body;
-  const notification = {
-    id: Date.now(),
-    message,
-    service,
-    read: false,
-    createdAt: new Date().toISOString()
-  };
-  notifications.push(notification)
+  const notification = createNotification(message, service);
+  res.status(201).json(notification);
+})
 
-  for (const client of clients) {
-    client.write(`data: ${JSON.stringify(notification)}\n\n`)
+router.post('/webhook', webhookLimiter, requireWebhook, (req, res) => {
+  const { message, service } = req.body;
+
+  if (!message) {
+    return res.status(400).json({ error: "message required" });
   }
 
+  const notification = createNotification(message, service);
   res.status(201).json(notification);
 })
 

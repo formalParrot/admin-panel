@@ -16,4 +16,12 @@ const apiLimiter = rateLimit({
   message: { error: "Too many requests, slow down." }
 });
 
-module.exports = { loginLimiter, apiLimiter };
+const webhookLimiter = rateLimit({
+  windowMs: 1000 * 60 * 15,
+  limit: Number(process.env.WEBHOOK_RATE_LIMIT) || 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests, slow down." }
+});
+
+module.exports = { loginLimiter, apiLimiter, webhookLimiter };
