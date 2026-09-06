@@ -103,7 +103,7 @@ router.post("/logout", (req, res) => {
   });
 })
 
-router.post("/lock", apiLimiter, requireAdmin, async (req, res) => {
+router.post("/lock", requireAdmin, async (req, res) => {
   const { action, ...body } = req.body;
 
   const path = allowedActions[action];
@@ -114,10 +114,14 @@ router.post("/lock", apiLimiter, requireAdmin, async (req, res) => {
     });
   }
 
+  const url = `${process.env.LOCK_API_URL}${path}`;
+
+  console.log(`[lock] ${action} -> ${url}`);
+
   let response;
   try {
     response = await fetch(
-      `${process.env.LOCK_API_URL}${path}`,
+      url,
       {
         method: action === "tokens" ? "GET" : "POST",
         headers: {
@@ -130,17 +134,22 @@ router.post("/lock", apiLimiter, requireAdmin, async (req, res) => {
       }
     );
   } catch (err) {
-    console.error("Lock API unreachable:", err.message);
+    console.error(`[lock] ${action} fetch failed:`, err.message, err.cause || "");
     return res.status(502).json({
       error: "Lock API unreachable"
     });
   }
 
-  console.log("Lock API status:", response.status);
+  console.log(`[lock] ${action} upstream status:`, response.status);
 
   const text = await response.text();
 
-  console.log("Lock API response:", text);
+  if (response.status === 502) {
+    console.error(`[lock] ${action} got 502 from upstream (origin behind Cloudflare likely down):`);
+    console.error(`[lock] body (first 400 chars):`, text.slice(0, 400));
+  } else {
+    console.log(`[lock] ${action} response (first 500 chars):`, text.slice(0, 500));
+  }
 
   return res.status(response.status).send(text);
 });
