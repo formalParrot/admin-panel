@@ -8,6 +8,13 @@ const path = require('path');
 
 const app = express()
 app.use(express.json());
+
+const trustProxy = process.env.TRUST_PROXY;
+app.set(
+  'trust proxy',
+  trustProxy === undefined ? 1 : trustProxy === 'true' ? true : Number(trustProxy)
+);
+
 const router = express.Router();
 
 const notificationRouter = require('./notifications')
