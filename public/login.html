@@ -226,7 +226,7 @@
           const data = await response.json();
 
           if (data.ok) {
-              window.location.reload();
+              window.location.href = "/admin";
           } else {
               alert(data.error || "Invalid PIN");
           }

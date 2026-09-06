@@ -1,7 +1,6 @@
 const express = require('express');
 const requireAdmin = require('./middleware/requireAdmin');
-const requireWebhook = require('./middleware/requireWebhook');
-const { apiLimiter, webhookLimiter } = require('./middleware/rateLimiter');
+const { apiLimiter } = require('./middleware/rateLimiter');
 const router = express.Router();
 
 function broadcast(notification) {
@@ -34,17 +33,6 @@ let lastSeenAt = null;
 
 router.post('/', apiLimiter, requireAdmin, (req, res) => {
   const { message, service } = req.body;
-  const notification = createNotification(message, service);
-  res.status(201).json(notification);
-})
-
-router.post('/webhook', webhookLimiter, requireWebhook, (req, res) => {
-  const { message, service } = req.body;
-
-  if (!message) {
-    return res.status(400).json({ error: "message required" });
-  }
-
   const notification = createNotification(message, service);
   res.status(201).json(notification);
 })
@@ -101,3 +89,4 @@ router.get('/stream', requireAdmin, (req, res) => {
 });
 
 module.exports = router
+module.exports.createNotification = createNotification

@@ -18,6 +18,7 @@ app.set(
 const router = express.Router();
 
 const notificationRouter = require('./notifications')
+const webhookRouter = require('./webhook')
 
 const allowedActions = {
   issue: "/lock/admin/issue",
@@ -39,6 +40,8 @@ app.use(session({
 }));
 
 app.get("/admin", (req, res) => {
+  res.set("Cache-Control", "no-store");
+
   if (!req.session?.admin) {
     return res.sendFile(__dirname + "/public/login.html");
   }
@@ -163,6 +166,7 @@ router.post("/lock", requireAdmin, async (req, res) => {
 
 app.use("/admin", router);
 app.use("/admin/notifications", notificationRouter)
+app.use("/admin/webhook", webhookRouter)
 
 app.use(express.static(path.join(__dirname, 'public/assets/')));
 
