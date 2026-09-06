@@ -525,10 +525,55 @@
             .notification.read {
             opacity: 1;
             }
+
+            .notif-banner {
+            position: fixed;
+            top: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: min(520px, calc(100vw - 32px));
+            padding: 12px 16px;
+            background: var(--surface);
+            border: 1px solid var(--border-strong);
+            border-left: 4px solid var(--accent);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-modal);
+            color: var(--ink);
+            font-size: 13px;
+            }
+
+            .notif-banner.hidden {
+            display: none;
+            }
+
+            .notif-banner strong {
+            color: var(--accent);
+            margin-right: 4px;
+            }
+
+            .notif-banner button {
+            border: none;
+            background: none;
+            color: var(--ink-faint);
+            font-size: 16px;
+            padding: 0 4px;
+            }
         </style>
 
     </head>
     <body data-theme="">
+        <div id="notif-banner" class="notif-banner hidden">
+            <div>
+                <strong id="notif-banner-service"></strong>
+                <span id="notif-banner-message"></span>
+            </div>
+            <button id="notif-banner-close" title="Dismiss">×</button>
+        </div>
+
         <div class="fc-c-c gap-0">
             <h1 class=" monsterrat">My Admin Panel</h1>
 
@@ -976,10 +1021,27 @@
 
       const source = new EventSource('/admin/notifications/stream');
 
+      let bannerTimer = null;
+
+      function showBanner(n) {
+        const banner = document.getElementById('notif-banner');
+        document.getElementById('notif-banner-service').textContent = n.service;
+        document.getElementById('notif-banner-message').textContent = n.message;
+        banner.classList.remove('hidden');
+        clearTimeout(bannerTimer);
+        bannerTimer = setTimeout(() => banner.classList.add('hidden'), 10000);
+      }
+
+      document.getElementById('notif-banner-close').addEventListener('click', () => {
+        clearTimeout(bannerTimer);
+        document.getElementById('notif-banner').classList.add('hidden');
+      });
+
       source.onmessage = (event) => {
         const notification = JSON.parse(event.data);
         notifications.unshift(notification);
         render();
+        showBanner(notification);
         playNotificationSound();
       };
 
