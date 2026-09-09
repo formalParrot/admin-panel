@@ -168,6 +168,8 @@ app.use("/admin", router);
 app.use("/admin/notifications", notificationRouter)
 app.use("/admin/webhook", webhookRouter)
 
+app.get("/", (req, res) => res.redirect("/admin"));
+
 app.use(express.static(path.join(__dirname, 'public/assets/')));
 
 const PORT = process.env.PORT || 9879;
