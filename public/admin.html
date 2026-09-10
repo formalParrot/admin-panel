@@ -15,11 +15,7 @@
                 font-weight: 600;
                 font-style: normal;
             }
-            .monsterrat-i {
-                font-family: "Montserrat", sans-serif;
-                font-optical-sizing: auto;
-                font-weight: 600;
-                font-style: italic;
+            .monsterrat-i { font-family: "Montserrat", sans-serif; font-optical-sizing: auto; font-weight: 600; font-style: italic;
             }
 
             table {
@@ -716,6 +712,7 @@
             if (missed.length > 0) {
               console.log(`You missed ${missed.length} notifications:`, missed);
               renderMissedPopup(missed);
+              playNotifSound();
             }
             return fetch('/admin/notifications/mark-seen', { method: 'POST' });
           });
@@ -1022,28 +1019,52 @@
 
       const source = new EventSource('/admin/notifications/stream');
 
-      let bannerTimer = null;
+      let notifAudioCtx = null;
 
-      function showBanner(n) {
-        const banner = document.getElementById('notif-banner');
-        document.getElementById('notif-banner-service').textContent = n.service;
-        document.getElementById('notif-banner-message').textContent = n.message;
-        banner.classList.remove('hidden');
-        clearTimeout(bannerTimer);
-        bannerTimer = setTimeout(() => banner.classList.add('hidden'), 10000);
+      function unlockAudio() {
+        if (notifAudioCtx && notifAudioCtx.state === 'suspended') notifAudioCtx.resume();
       }
-
-      document.getElementById('notif-banner-close').addEventListener('click', () => {
-        clearTimeout(bannerTimer);
-        document.getElementById('notif-banner').classList.add('hidden');
+      ['click', 'keydown', 'pointerdown'].forEach((ev) => {
+        document.addEventListener(ev, unlockAudio);
       });
+
+      function playNotifSound() {
+        if (!notifAudioCtx) {
+          notifAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        const ctx = notifAudioCtx;
+        const playNow = () => {
+          const t = ctx.currentTime;
+          const notes = [
+            { f: 880, d: 0.18, at: 0 },
+            { f: 1174.66, d: 0.35, at: 0.25 },
+          ];
+          notes.forEach(({ f, d, at }) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(f, t + at);
+            gain.gain.setValueAtTime(0.001, t + at);
+            gain.gain.exponentialRampToValueAtTime(0.9, t + at + 0.03);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + at + d);
+            osc.start(t + at);
+            osc.stop(t + at + d + 0.03);
+          });
+        };
+        if (ctx.state === 'suspended') {
+          ctx.resume().then(playNow).catch(playNow);
+        } else {
+          playNow();
+        }
+      }
 
       source.onmessage = (event) => {
         const notification = JSON.parse(event.data);
         notifications.unshift(notification);
         render();
-        showBanner(notification);
-        playNotificationSound();
+        playNotifSound();
       };
 
 
