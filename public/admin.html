@@ -3,566 +3,16 @@
     <head>
         <title>Admin</title>
         <link rel="stylesheet" href="https://justparrot.me/place/place.css">
+        <script src="https://unpkg.com/lucide@latest"></script>
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
-        <style>
-            .monsterrat {
-                font-family: "Montserrat", sans-serif;
-                font-optical-sizing: auto;
-                font-weight: 600;
-                font-style: normal;
-            }
-            .monsterrat-i { font-family: "Montserrat", sans-serif; font-optical-sizing: auto; font-weight: 600; font-style: italic;
-            }
-
-            table {
-                width: 100%;
-            }
-
-            th, td {
-                text-align: left;
-                padding: 8px;
-            }
-
-            .gray {
-                color: dimgray;
-            }
-
-            .orange {
-                color: orangered;
-            }
-        </style>
-
-        <style>
-            .tokenRevoke {
-                display: none;
-                position: fixed;
-                inset: 0;
-                background: rgba(0, 0, 0, 0.5);
-
-                align-items: center;
-                justify-content: center;
-            }
-
-            .tokenRevoke-content {
-                background: white;
-                padding: 30px;
-                border-radius: 15px;
-                width: 400px;
-            }
-
-            .tokenIssue {
-                display: none;
-                position: fixed;
-                inset: 0;
-                background: rgba(0, 0, 0, 0.5);
-
-                align-items: center;
-                justify-content: center;
-            }
-
-            .tokenIssue-content {
-                background: white;
-                padding: 30px;
-                border-radius: 15px;
-                width: 400px;
-            }
-
-            .tokenIssue-show {
-                display: none;
-                position: fixed;
-                inset: 0;
-                background: rgba(0, 0, 0, 0.5);
-
-                align-items: center;
-                justify-content: center;
-            }
-
-            .tokenIssue-show-content {
-                background: white;
-                padding: 30px;
-                border-radius: 15px;
-                width: 400px;
-            }
-
-            .tokenAll {
-                display: none;
-                position: fixed;
-                inset: 0;
-                background: rgba(0, 0, 0, 0.5);
-
-                align-items: center;
-                justify-content: center;
-            }
-
-            .tokenAll-content {
-                background: white;
-                padding: 30px;
-                border-radius: 15px;
-                width: 700px;
-            }
-        </style>
-
-        <style>
-            .notification {
-            padding: 8px;
-            border-bottom: 1px solid #ddd;
-            }
-
-            .notification.unread {
-            font-weight: bold;
-            background: #f0f8ff;
-            }
-
-            .notification.read {
-            opacity: 0.6;
-            }
-        </style>
-
-        <style>
-            :root {
-            --bg: #faf9f6;
-            --surface: #ffffff;
-            --border: #e4e1d8;
-            --border-strong: #cfccc1;
-
-            --ink: #211f1b;
-            --ink-muted: #6e6b62;
-            --ink-faint: #a8a49a;
-
-            --accent: #b5501f;
-            --accent-bg: #fbeee6;
-
-            --status-active: #3f7d4b;
-            --status-active-bg: #eaf4ec;
-            --status-revoked: #8c8a82;
-            --status-revoked-bg: #f0efeb;
-            --status-expired: #a9861f;
-            --status-expired-bg: #f8f1de;
-
-            --radius: 8px;
-            --radius-sm: 5px;
-
-            --gap-0: 0;
-            --gap-s: 8px;
-            --gap-m: 16px;
-            --gap-l: 28px;
-
-            --shadow-modal: 0 12px 32px rgba(33, 31, 27, 0.18);
-            }
-
-            [data-theme="dark"] {
-            --bg: #171613;
-            --surface: #201f1b;
-            --border: #34322c;
-            --border-strong: #46443c;
-
-            --ink: #f0eee7;
-            --ink-muted: #a8a49a;
-            --ink-faint: #6e6b62;
-
-            --accent: #e0793e;
-            --accent-bg: #3a2a1e;
-
-            --status-active: #6bb679;
-            --status-active-bg: #223a28;
-            --status-revoked: #a8a49a;
-            --status-revoked-bg: #2b2a26;
-            --status-expired: #d6b24a;
-            --status-expired-bg: #3a301a;
-
-            --shadow-modal: 0 12px 32px rgba(0, 0, 0, 0.5);
-            }
-
-            [data-theme="high-contrast"] {
-            --bg: #ffffff;
-            --surface: #ffffff;
-            --border: #000000;
-            --border-strong: #000000;
-
-            --ink: #000000;
-            --ink-muted: #000000;
-            --ink-faint: #333333;
-
-            --accent: #b5501f;
-            --accent-bg: #fbeee6;
-
-            --status-active: #1a6b2a;
-            --status-active-bg: #d4f0da;
-            --status-revoked: #333333;
-            --status-revoked-bg: #e0e0e0;
-            --status-expired: #8a6500;
-            --status-expired-bg: #f5ecc8;
-
-            --shadow-modal: 0 12px 32px rgba(0, 0, 0, 0.3);
-            }
-
-            * {
-            box-sizing: border-box;
-            }
-
-            html {
-            color-scheme: light;
-            }
-
-            body {
-            margin: 0;
-            padding: 32px 40px 56px;
-            background: var(--bg);
-            color: var(--ink);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-            font-size: 14px;
-            line-height: 1.5;
-            -webkit-font-smoothing: antialiased;
-            }
-
-            .monsterrat {
-            font-family: "Montserrat", sans-serif;
-            font-optical-sizing: auto;
-            font-weight: 600;
-            font-style: normal;
-            }
-
-            .monsterrat-i {
-            font-family: "Montserrat", sans-serif;
-            font-optical-sizing: auto;
-            font-weight: 600;
-            font-style: italic;
-            }
-
-            h1 {
-            font-size: 22px;
-            letter-spacing: -0.01em;
-            margin: 0 0 4px;
-            color: var(--ink);
-            }
-
-            h3 {
-            font-size: 14px;
-            margin: 0 0 14px;
-            color: var(--ink-muted);
-            }
-
-            body > div.fc-c-c:first-of-type {
-            flex-direction: row;
-            align-items: baseline;
-            justify-content: space-between;
-            width: 100%;
-            margin-bottom: 28px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border);
-            }
-
-            button {
-            font-family: inherit;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--ink);
-            background: var(--surface);
-            border: 1px solid var(--border-strong);
-            border-radius: var(--radius-sm);
-            padding: 8px 14px;
-            cursor: pointer;
-            transition: border-color 0.12s ease, background 0.12s ease;
-            }
-
-            button:hover {
-            border-color: var(--ink-faint);
-            background: #f5f4f0;
-            }
-
-            button:active {
-            background: #ececE6;
-            }
-
-            button:focus-visible {
-            outline: 2px solid var(--accent);
-            outline-offset: 2px;
-            }
-
-            #logout-btn {
-            color: var(--ink-muted);
-            }
-
-            #issue,
-            #tokenIssue-btn,
-            #tokenRevoke-btn {
-            color: var(--accent);
-            border-color: #e4c1ac;
-            background: var(--accent-bg);
-            }
-
-            #issue:hover,
-            #tokenIssue-btn:hover,
-            #tokenRevoke-btn:hover {
-            background: #f6ddc9;
-            border-color: var(--accent);
-            }
-
-            #revoke {
-            color: var(--ink-muted);
-            }
-
-            .tokenIssue-content > button,
-            .tokenIssue-show-content > button,
-            .tokenRevoke-content > button,
-            .tokenAll-content > button {
-            align-self: flex-end;
-            border: none;
-            background: none;
-            color: var(--ink-faint);
-            font-size: 18px;
-            line-height: 1;
-            padding: 2px 4px;
-            }
-
-            .tokenIssue-content > button:hover,
-            .tokenIssue-show-content > button:hover,
-            .tokenRevoke-content > button:hover,
-            .tokenAll-content > button:hover {
-            color: var(--ink);
-            background: none;
-            }
-
-            div[style*="border: 1.5px black solid"] {
-            border: 1px solid var(--border) !important;
-            border-radius: var(--radius) !important;
-            background: var(--surface);
-            }
-
-            [data-theme="high-contrast"] div[style*="border: 1.5px black solid"] {
-            border-width: 2px !important;
-            }
-
-            [data-theme="high-contrast"] table {
-            border: 2px solid var(--border);
-            }
-
-            [data-theme="high-contrast"] thead th {
-            border-bottom: 2px solid var(--border);
-            }
-
-            [data-theme="high-contrast"] #tokens tr {
-            border-bottom: 2px solid var(--border);
-            }
-
-            [data-theme="high-contrast"] .notification {
-            border-bottom: 2px solid var(--border);
-            }
-
-            [data-theme="high-contrast"] button {
-            border-width: 2px;
-            }
-
-            [data-theme="high-contrast"] input {
-            border-width: 2px;
-            }
-
-            table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-            }
-
-            thead th {
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: none;
-            color: var(--ink-faint);
-            border-bottom: 1px solid var(--border);
-            padding: 6px 8px;
-            }
-
-            #tokens {
-            color: var(--ink-muted);
-            }
-
-            #tokens tr {
-            border-bottom: 1px solid var(--border);
-            }
-
-            #tokens tr:last-child {
-            border-bottom: none;
-            }
-
-            #tokens td {
-            padding: 10px 8px;
-            color: var(--ink);
-            }
-
-            #tokens td:first-child {
-            font-variant-numeric: tabular-nums;
-            }
-
-            .orange {
-            color: var(--accent);
-            font-weight: 500;
-            }
-
-            .gray {
-            color: var(--ink-muted);
-            }
-
-            #tokens td:last-child {
-            font-weight: 500;
-            }
-
-            input {
-            font-family: inherit;
-            font-size: 13px;
-            color: var(--ink);
-            background: var(--surface);
-            border: 1px solid var(--border-strong);
-            border-radius: var(--radius-sm);
-            padding: 9px 11px;
-            width: 100%;
-            }
-
-            input::placeholder {
-            color: var(--ink-faint);
-            }
-
-            input:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-bg);
-            }
-
-            form {
-            width: 100%;
-            }
-
-            .tokenIssue,
-            .tokenIssue-show,
-            .tokenRevoke,
-            .tokenAll {
-            align-items: center;
-            justify-content: center;
-            background: rgba(33, 31, 27, 0.45);
-            }
-
-            .tokenIssue-content,
-            .tokenIssue-show-content,
-            .tokenRevoke-content,
-            .tokenAll-content {
-            background: var(--surface);
-            border-radius: 12px;
-            box-shadow: var(--shadow-modal);
-            align-items: stretch;
-            }
-
-            .tokenIssue-content h2,
-            .tokenRevoke-content h2 {
-            font-size: 16px;
-            margin: 0 0 4px;
-            color: var(--ink);
-            }
-
-            #tokenIssue-show-txt {
-            color: var(--accent);
-            font-weight: 500;
-            text-decoration: none;
-            word-break: break-all;
-            }
-
-            #tokenIssue-show-txt:hover {
-            text-decoration: underline;
-            }
-
-            #notification-bell {
-            width: 100%;
-            }
-
-            #unread-count {
-            display: inline-block;
-            font-size: 12px;
-            color: var(--ink-muted);
-            }
-
-            #notification-list {
-            width: 100%;
-            margin-top: 8px;
-            }
-
-            .notification {
-            padding: 9px 4px;
-            border-bottom: 1px solid var(--border);
-            font-size: 13px;
-            color: var(--ink-muted);
-            cursor: pointer;
-            }
-
-            .notification:last-child {
-            border-bottom: none;
-            }
-
-            .notification strong {
-            color: var(--ink);
-            font-weight: 600;
-            margin-right: 4px;
-            }
-
-            .notification.unread {
-            font-weight: 400;
-            background: var(--accent-bg);
-            color: var(--ink);
-            border-radius: var(--radius-sm);
-            padding-left: 8px;
-            padding-right: 8px;
-            }
-
-            .notification.unread strong {
-            color: var(--accent);
-            }
-
-            .notification.read {
-            opacity: 1;
-            }
-
-            .notif-banner {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            max-width: min(80vw, 800px);
-            padding: 32px 40px;
-            background: var(--surface);
-            border: 2px solid var(--border-strong);
-            border-left: 6px solid var(--accent);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-modal);
-            color: var(--ink);
-            font-size: 28px;
-            }
-
-            .notif-banner.hidden {
-            display: none;
-            }
-
-            .notif-banner strong {
-            color: var(--accent);
-            margin-right: 8px;
-            font-size: 32px;
-            }
-
-            .notif-banner button {
-            border: none;
-            background: none;
-            color: var(--ink-faint);
-            font-size: 32px;
-            padding: 0 8px;
-            }
-        </style>
+        <link rel="stylesheet" href="/admin/style.css">
 
     </head>
-    <body data-theme="">
+    <body data-theme="" class="admin-body">
         <div id="notif-banner" class="notif-banner hidden">
             <div>
                 <strong id="notif-banner-service"></strong>
@@ -571,21 +21,70 @@
             <button id="notif-banner-close" title="Dismiss">×</button>
         </div>
 
-        <div class="fc-c-c gap-0">
-            <h1 class=" monsterrat">My Admin Panel</h1>
+        <nav class="sidebar">
+            <div class="sidebar-top">
+                <a href="#" class="sidebar-item active" data-page="home">
+                    <i data-lucide="house"></i>
+                    <span>Home</span>
+                </a>
+                <a href="#" class="sidebar-item" data-page="tokens">
+                    <i data-lucide="key-round"></i>
+                    <span>Tokens</span>
+                </a>
+                <a href="#" class="sidebar-item" data-page="mc">
+                    <i data-lucide="server"></i>
+                    <span>Factory 42</span>
+                </a>
+                <a href="#" class="sidebar-item" data-page="webhooks">
+                    <i data-lucide="webhook"></i>
+                    <span>Webhooks</span>
+                </a>
+            </div>
+            <div class="sidebar-bottom">
+                <a href="#" class="sidebar-item" data-page="settings" style="margin-bottom: 15px;">
+                    <i data-lucide="settings"></i>
+                    <span>Settings</span>
+                </a>
+                <button id="theme-toggle" class="sidebar-item">
+                    <i data-lucide="moon"></i>
+                    <span>Dark mode</span>
+                </button>
+                <button id="logout-btn" class="sidebar-item sidebar-logout">
+                    <i data-lucide="log-out"></i>
+                    <span>Log Out</span>
+                </button>
+            </div>
+        </nav>
 
-            <button id="logout-btn" style="margin-bottom: 10px;">Log Out</button>
+        <main class="main-content">
+            <div class="fc-c-c gap-0">
+                <h1 class="monsterrat">My Admin Panel</h1>
+            </div>
 
-            <button id="theme-toggle" style="margin-bottom: 10px;">Dark mode</button>
-        </div>
+            <section class="page-section" id="page-home">
+                <h2 class="monsterrat-i">Home</h2>
+                <div class="" style="display: flex; flex-wrap: wrap; gap: 15px;">
+                    <div style="border: 1.5px black solid; padding: 15px; border-radius: 7px; flex: 1 1 250px;">
+                        <h3 class="monsterrat-i t-c-c">Notifications</h3>
 
-        <div>
-            <div class="f-c-c gap-l">
-                <div style="border: 1.5px black solid; padding: 5px; border-radius: 7px;">
+                        <div id="notification-bell">
+                            <span class="monsterrat" style="padding-bottom:5px;"id="unread-count"></span>
+                            <span id="sound-hint" class="gray" style="display: none;">Sound on next click</span>
+                            <div id="notification-list"></div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <section class="page-section" id="page-tokens">
+                <h2 class="monsterrat-i">Tokens</h2>
+                <div class="f-c-c">
+                    <div style="border: 1.5px black solid; padding: 5px; border-radius: 7px; width: 100%;">
                     <h3 class="monsterrat-i t-c-c">Tokens</h3>
                     <table>
                         <thead>
-                            <tr>
+                            <tr class="t-x-l">
                                 <th class="">ID</th>
                                 <th class="">User</th>
                                 <th class="">Site</th>
@@ -595,7 +94,6 @@
                         </thead>
 
                         <tbody id="tokens" class="gray">
-                            <!-- Rows get inserted here -->
                         </tbody>
                     </table>
                     <div class="f-c-c gap-m" style="margin-top: 15px; margin-bottom: 15px;">
@@ -603,9 +101,9 @@
                         <button id="revoke">Revoke Token</button>
                         <button id="view-all">View All</button>
                     </div>
-                    <div class="fc-c-c tokenIssue" id="tokenIssue">
-                        <div class="tokenIssue-content g-c-c">
-                            <button onclick="closePopup('tokenIssue')">×</button>
+                    <div class="popup" id="tokenIssue">
+                        <div class="popup-content g-c-c">
+                            <button class="popup-close" onclick="closePopup('tokenIssue')">×</button>
                             <h2>Issue an Access Token</h2>
 
                             <form id="issue-form" class="g-c-c gap-s">
@@ -617,16 +115,16 @@
                             </form>
                         </div>
                     </div>
-                    <div class="fc-c-c tokenIssue-show" id="tokenIssue-show">
-                        <div class="tokenIssue-show-content g-c-c gap-m">
-                            <button onclick="closePopup('tokenIssue-show')">×</button>
+                    <div class="popup" id="tokenIssue-show">
+                        <div class="popup-content g-c-c gap-m">
+                            <button class="popup-close" onclick="closePopup('tokenIssue-show')">×</button>
 
                             <a id="tokenIssue-show-txt">Activate Link</a>
                         </div>
                     </div>
-                    <div class="fc-c-c tokenRevoke" id="tokenRevoke">
-                        <div class="tokenRevoke-content g-c-c">
-                            <button onclick="closePopup('tokenRevoke')">×</button>
+                    <div class="popup" id="tokenRevoke">
+                        <div class="popup-content g-c-c">
+                            <button class="popup-close" onclick="closePopup('tokenRevoke')">×</button>
                             <h2>Revoke an Access Token</h2>
 
                             <form id="revoke-form" class="g-c-c gap-s">
@@ -636,9 +134,9 @@
                             </form>
                         </div>
                     </div>
-                    <div class="fc-c-c tokenAll" id="tokenAll">
-                        <div class="tokenAll-content g-c-c" style="max-height: 80vh; overflow-y: auto;">
-                            <button onclick="closePopup('tokenAll')">×</button>
+                    <div class="popup" id="tokenAll">
+                        <div class="popup-content popup-wide g-c-c">
+                            <button class="popup-close" onclick="closePopup('tokenAll')">×</button>
                             <h2>All Tokens</h2>
                             <table>
                                 <thead>
@@ -654,35 +152,131 @@
                             </table>
                         </div>
                     </div>
-                    <div class="fc-c-c tokenIssue" id="tokenMissed">
-                        <div class="tokenIssue-content g-c-c">
-                            <button onclick="closePopup('tokenMissed')">×</button>
-                            <h2>Missed Notifications</h2>
-                            <div id="missed-list"></div>
-                        </div>
-                    </div>
                 </div>
-                <div class="" style="display: flex; flex-wrap: wrap; gap: 15px;">
-                    <div style="border: 1.5px black solid; padding: 15px; border-radius: 7px; flex: 1 1 250px;">
-                        <h3 class="monsterrat-i t-c-c">Notifications</h3>
+            </section>
 
-                        <div id="notification-bell">
-                            <span class="monsterrat" style="padding-bottom:5px;"id="unread-count"></span>
-                            <span id="sound-hint" class="gray" style="display: none;">Sound on next click</span>
-                            <div id="notification-list"></div>
-                        </div>
-                    </div>
-
-                    <div style="border: 1.5px black solid; padding: 15px; border-radius: 7px; flex: 1 1 250px;">
-                        <h3>Test wrap</h3>
-                    </div>
-
-                    <div style="border: 1.5px black solid; padding: 15px; border-radius: 7px; flex: 1 1 250px;">
-                        <h3>..</h3>
-                    </div>
+            <div class="popup" id="tokenMissed">
+                <div class="popup-content g-c-c">
+                    <button class="popup-close" onclick="closePopup('tokenMissed')">×</button>
+                    <h2>Missed Notifications</h2>
+                    <div id="missed-list"></div>
                 </div>
             </div>
-        </div>
+
+            <section class="page-section" id="page-mc">
+                <h2 class="monsterrat-i">Factory 42</h2>
+                <div class="g-c-c gap-m" style="display: flex; flex-wrap: wrap; gap: 15px;">
+                    <div class="box-card-main" style="border: 1.5px black solid; padding: 15px; border-radius: 7px; flex: 1 1 250px;">
+                        <h3 class="monsterrat-i t-x-c">Velocity</h3>
+                        <p id="vel-status"></p>
+
+                        <p id="vel-weaskforyourattention">No player data available.</p>
+
+                        <div class="f-c-c gap-m" style="margin-bottom: 15px;">
+                            <div class="fc-x-x gap-s">
+                                <div>
+                                    <button id="Btn-velStart" class="customButton" onClick="" start>Start</button>
+                                    <button id="Btn-velStop" class="customButton" onClick="" stop disabled>Stop</button>
+                                    <button id="Btn-velRestart" class="customButton" onClick="" disabled>Restart</button>
+                                </div>
+                                <button id="Btn-velConsole" class="customButton fill-w" onClick="openPopup('velConsole')">Console</button>
+                            </div>
+                        </div>
+
+                        <div class="popup" style="padding: 75px; max-height: calc(100vh - 120px);" id="velConsole">
+                            <div class="popup-content popup-full">
+                                <div class="g-c-c">
+                                    <button class="popup-close" onclick="closePopup('velConsole')">×</button>
+                                    <h2 style="margin-top: 5px;"><strong>Velocity</strong> Console</h2>
+                                </div>
+
+                                <div id="velConsole-Text" style="background:#111; color:#ddd; font-family: monospace; margin:0; max-height: calc(100vh - 120px); overflow-y: auto;">
+                                    <p> amazing </p>
+                                </div>
+
+                                <input id="velConsole-Send" style="margin-top:15px" placeholder="Console">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-card-main" style="border: 1.5px black solid; padding: 15px; border-radius: 7px; flex: 1 1 250px;">
+                        <h3 class="monsterrat-i t-x-c">Survival</h3>
+                        <p id="surv-status"></p>
+
+                        <p id="surv-online"></p>
+
+                        <p style="color: grey;" id="surv-players"></p>
+
+                        <div class="f-c-c gap-m" style="margin-bottom: 15px;">
+                            <div class="fc-x-x gap-s">
+                                <div>
+                                    <button id="Btn-survStart" class="customButton" onClick="" start>Start</button>
+                                    <button id="Btn-survStop" class="customButton" onClick="" stop disabled>Stop</button>
+                                    <button id="Btn-survRestart" class="customButton" onClick="" disabled>Restart</button>
+                                </div>
+                                <button id="Btn-survConsole" class="customButton fill-w" onClick="openPopup('survConsole')">Console</button>
+                            </div>
+                        </div>
+
+                        <div class="popup" style="padding: 75px; max-height: calc(100vh - 120px);" id="survConsole">
+                            <div class="popup-content popup-full">
+                                <div class="g-c-c">
+                                    <button class="popup-close" onclick="closePopup('survConsole')">×</button>
+                                    <h2 style="margin-top: 5px;"><strong>Survival</strong> Console</h2>
+                                </div>
+
+                                <div id="survConsole-Text" style="background:#111; color:#ddd; font-family: monospace; margin:0; max-height: calc(100vh - 120px); overflow-y: auto;">
+                                    <p> amazing </p>
+                                </div>
+
+                                <input id="survConsole-Send"style="margin-top:15px" placeholder="Console">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-card-main" style="border: 1.5px black solid; padding: 15px; border-radius: 7px; flex: 1 1 250px;">
+                        <h3 class="monsterrat-i t-x-c">Creative</h3>
+                        <p id="cre-status"></p>
+
+                        <p id="cre-online"></p>
+
+                        <p style="color: grey;" id="cre-players"></p>
+
+                        <div class="f-c-c gap-m" style="margin-bottom: 15px;">
+                            <div class="fc-x-x gap-s">
+                                <div>
+                                    <button id="Btn-creStart" class="customButton" onClick="" start>Start</button>
+                                    <button id="Btn-creStop" class="customButton" onClick="" stop disabled>Stop</button>
+                                    <button id="Btn-creRestart" class="customButton" onClick="" disabled>Restart</button>
+                                </div>
+                                <button id="Btn-creConsole" class="customButton fill-w" onClick="openPopup('creConsole')">Console</button>
+                            </div>
+                        </div>
+
+                        <div class="popup" style="padding: 75px; max-height: calc(100vh - 120px);" id="creConsole">
+                            <div class="popup-content popup-full">
+                                <div class="g-c-c">
+                                    <button class="popup-close" onclick="closePopup('creConsole')">×</button>
+                                    <h2 style="margin-top: 5px;"><strong>Creative</strong> Console</h2>
+                                </div>
+
+                                <div id="creConsole-Text" style="background:#111; color:#ddd; font-family: monospace; margin:0; max-height: calc(100vh - 120px); overflow-y: auto;">
+                                    <p> amazing </p>
+                                </div>
+
+                                <input id="creConsole-Send" style="margin-top:15px" placeholder="Console">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page-section" id="page-webhooks">
+                <h2 class="monsterrat-i">Webhooks</h2>
+            </section>
+
+            <section class="page-section" id="page-settings">
+                <h2 class="monsterrat-i">Settings</h2>
+            </section>
+        </main>
     </body>
 
     <script>
@@ -692,8 +286,192 @@
           if (res.ok) window.location.reload();
           else console.error("Logout failed", res.status);
         });
+
+        document.querySelectorAll(".sidebar-item[data-page]").forEach((item) => {
+          item.addEventListener("click", (e) => {
+            e.preventDefault();
+            switchPage(item);
+          });
+        });
+
+        function switchPage(item) {
+          const page = item.dataset.page;
+          localStorage.setItem("page", page);
+          document.querySelectorAll(".page-section").forEach((sec) => {
+            sec.classList.toggle("hidden", sec.id !== "page-" + page);
+          });
+          document.querySelectorAll(".sidebar-item[data-page]").forEach((i) => {
+            i.classList.toggle("active", i === item);
+          });
+        }
+
+        const savedPage = localStorage.getItem("page");
+        const startItem = document.querySelector(`.sidebar-item[data-page="${savedPage}"]`) || document.querySelector(".sidebar-item[data-page].active") || document.querySelector(".sidebar-item[data-page]");
+        switchPage(startItem);
+
+        if (window.lucide) lucide.createIcons();
       });
     </script>
+
+    <!-- factory 42 -->
+    <script>
+      function upstreamStatus(name) {
+        return fetch(`/admin/f42/services/${name}`)
+      }
+    </script>
+    <script>
+      const velConsole = document.getElementById("velConsole")
+      velConsole.scrollTop = velConsole.scrollHeight;
+
+      const survConsole = document.getElementById("velConsole")
+      survConsole.scrollTop = survConsole.scrollHeight;
+
+      const creConsole = document.getElementById("velConsole")
+      creConsole.scrollTop = creConsole.scrollHeight;
+
+      const services = [
+        { name: "Velocity",      id: "vel" },
+        { name: "Survival",      id: "surv" },
+        { name: "Creative",      id: "cre" },
+      ]
+
+      for (const service of services) {
+        setupService(service.name, service.id);
+      }
+
+      function setupService(name, id) {
+        const statusEl   = document.getElementById(`${id}-status`);
+        const onlineEl   = document.getElementById(`${id}-online`);
+        const playersEl  = document.getElementById(`${id}-players`);
+
+        const startBtn   = document.getElementById(`Btn-${id}Start`);
+        const stopBtn    = document.getElementById(`Btn-${id}Stop`);
+        const restartBtn = document.getElementById(`Btn-${id}Restart`);
+
+        const consoleEl     = document.getElementById(`${id}Console-Text`);
+        const consoleSend   = document.getElementById(`${id}Console-Send`);
+
+        consoleEl.scrollTop = consoleEl.scrollHeight;
+
+        async function updateStatus() {
+          let running = false;
+
+          try {
+            const res = await upstreamStatus(name);
+            const data = res.ok ? await res.json() : {};
+            running = !!data.running;
+            const online = data.playerCount;
+
+            statusEl.innerHTML = `Status: <strong>${running ? 'online' : 'offline'}</strong>`;
+
+            if (id === 'vel') {
+              console.log("vel")
+            } else {
+              onlineEl.innerHTML = `Online: <strong>${online}</strong>`
+            }
+            startBtn.disabled = running
+            stopBtn.disabled = !running
+            restartBtn.disabled = !running
+
+            playersEl.innerHTML = '';
+            for (const player of data.players) {
+              playersEl.appendChild(document.createTextNode(player));
+              playersEl.appendChild(document.createElement('br'));
+            }
+
+          } catch {
+            statusEl.innerHTML = `Status: <strong>offline</strong>`;
+          }
+        }
+
+        function appendLine(txt, cls) {
+          const div = document.createElement("div");
+          if (cls) div.className = cls;
+          div.textContent = txt
+          consoleEl.appendChild(div);
+          consoleEl.scrollTop = consoleEl.scrollHeight;
+        }
+
+        const ws = new WebSocket(
+          `/admin/f42/ws?service=${name}`
+        );
+
+        ws.addEventListener("open", () => {
+          statusEl.innerHTML = 'Status: <strong style="color:#4caf50">connected</strong>';
+        });
+
+        ws.addEventListener("message", async (event) => {
+          try {
+            const raw = event.data instanceof Blob
+              ? await event.data.text()
+              : event.data;
+            const data = JSON.parse(raw);
+
+            switch (data.type) {
+              case "status":
+                statusEl.innerHTML =
+                  `Status: <strong>${data.running ? "online" : "offline"}</strong>`;
+                break;
+
+              case "line":
+                  appendLine(data.text, "p");
+                  break;
+
+              case "echo":
+                appendLine(`> ${data.text}`, "p");
+                break;
+
+              case "error":
+                appendLine(`ERROR: ${data.error}`, "p");
+                break;
+            }
+          } catch (err) {
+            console.error("Failed to parse WebSocket message:", event.data);
+          }
+        })
+
+        ws.addEventListener("close", () => {
+          console.log(`${name} WebSocket disconnected`);
+        });
+
+        ws.addEventListener("error", (err) => {
+          console.error(`${name} WebSocket error:`, err);
+        });
+
+        startBtn.onclick = () =>
+          fetch(`/admin/f42/services/${name}/start`, {
+            method: "POST"
+          })
+
+        stopBtn.onclick = () =>
+          fetch(`/admin/f42/services/${name}/stop`, {
+            method: "POST"
+          })
+
+        consoleSend.addEventListener("keydown", (event) => {
+          if (event.key !== "Enter") return;
+
+          const command = consoleSend.value.trim();
+
+          if (!command) return;
+
+          if (ws.readyState !== WebSocket.OPEN) {
+            console.error("WebSocket isn't connected");
+            return;
+          }
+
+          ws.send(JSON.stringify({
+            command: command
+          }));
+
+          consoleSend.value = "";
+        });
+
+        updateStatus();
+        setInterval(updateStatus, 10000);
+      }
+    </script>
+
 
     <!-- notifications -->
     <script>
@@ -743,6 +521,20 @@
         function closePopup(popup) {
             document.getElementById(popup).style.display = "none";
         }
+
+        document.querySelectorAll(".popup").forEach((popup) => {
+            popup.addEventListener("click", (e) => {
+                if (e.target === popup) closePopup(popup.id);
+            });
+        });
+
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") {
+                document.querySelectorAll(".popup").forEach((popup) => {
+                    if (popup.style.display === "flex") closePopup(popup.id);
+                });
+            }
+        });
 
         function closeForm(la) {
             la.reset()
@@ -884,6 +676,7 @@
         loadTokens();
       }, 10000);
     </script>
+
     <!-- notif sound -->
     <script>
       let notificationCtx = null;
@@ -1072,22 +865,25 @@
         console.error('SSE connection error:', err);
       };
     </script>
+
     <!-- theme switcher -->
     <script>
       const root = document.documentElement;
+      const themeToggle = document.getElementById('theme-toggle');
+      const themeLabel = themeToggle.querySelector('span');
       const saved = localStorage.getItem('theme');
       if (saved) {
         root.setAttribute('data-theme', saved);
-        document.getElementById('theme-toggle').textContent = { light: 'Dark mode', dark: 'High contrast', 'high-contrast': 'Light mode' }[saved];
+        themeLabel.textContent = { light: 'Dark mode', dark: 'High contrast', 'high-contrast': 'Light mode' }[saved];
       }
 
-      document.getElementById('theme-toggle').addEventListener('click', () => {
+      themeToggle.addEventListener('click', () => {
         const current = root.getAttribute('data-theme') || 'light';
         const themes = ['light', 'dark', 'high-contrast'];
         const next = themes[(themes.indexOf(current) + 1) % themes.length];
         if (next === 'light') root.removeAttribute('data-theme');
         else root.setAttribute('data-theme', next);
-        document.getElementById('theme-toggle').textContent = { light: 'Dark mode', dark: 'High contrast', 'high-contrast': 'Light mode' }[next];
+        themeLabel.textContent = { light: 'Dark mode', dark: 'High contrast', 'high-contrast': 'Light mode' }[next];
         localStorage.setItem('theme', next);
       });
     </script>
