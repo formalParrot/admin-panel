@@ -57,12 +57,13 @@
         </nav>
 
         <main class="main-content">
-            <div class="fc-c-c gap-0">
+        <!--div class="fc-c-c gap-0">
                 <h1 class="monsterrat">My Admin Panel</h1>
-            </div>
+            </div-->
 
             <section class="page-section" id="page-home">
-                <h2 class="monsterrat-i">Home</h2>
+                <!--h2 class="monsterrat-i">Home</h2-->
+                <h1 class="t-x-c monsterrat" style="font-size: 450px;" id="clock-1">12:00</h1>
                 <div class="" style="display: flex; flex-wrap: wrap; gap: 15px;">
                     <div style="border: 1.5px black solid; padding: 15px; border-radius: 7px; flex: 1 1 250px;">
                         <h3 class="monsterrat-i t-c-c">Notifications</h3>
@@ -278,6 +279,23 @@
             </section>
         </main>
     </body>
+
+    <!-- Time -->
+    <script>
+        function updateClock() {
+            const date = new Date()
+
+            const hours = date.getHours()
+            const minutes = String(date.getMinutes()).padStart(2, "0")
+
+            document.getElementById("clock-1").innerHTML = `${hours}:${minutes}`
+        }
+
+        addEventListener("DOMContentLoaded", (event) => {
+          updateClock()
+          setInterval(updateClock, 1000)
+        })
+    </script>
 
     <script>
       document.addEventListener("DOMContentLoaded", () => {
