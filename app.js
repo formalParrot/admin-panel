@@ -129,7 +129,8 @@ router.post("/lock", requireAdmin, async (req, res) => {
     });
   }
 
-  const url = `${process.env.LOCK_INTERNAL_URL || process.env.LOCK_API_URL}${path}`;
+  const base = (process.env.LOCK_INTERNAL_URL || process.env.LOCK_API_URL || "").replace(/\/+$/, "");
+  const url = `${base}${path}`;
 
   console.log(`[lock] ${action} -> ${url}`);
 
@@ -173,7 +174,7 @@ router.all("/f42/*splat", requireAdmin, async (req, res) => {
   const splat = Array.isArray(req.params.splat) ? req.params.splat.join('/') : req.params.splat;
 
   try {
-    const response = await fetch(`${process.env.F42_INTERNAL_URL || 'https://api.justparrot.me'}/f42/${splat}`, {
+    const response = await fetch(`${(process.env.F42_INTERNAL_URL || 'https://api.justparrot.me').replace(/\/+$/, '')}/f42/${splat}`, {
       method: req.method,
       headers: {
         'Content-Type': "application/json",
